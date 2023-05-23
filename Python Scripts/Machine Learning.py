@@ -5,6 +5,7 @@ from sklearn.linear_model import LinearRegression
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import mean_squared_error
 import numpy as np
+from datetime import datetime
 
 #tips = sns.load_dataset('tips')
 #print(tips.head())
@@ -117,5 +118,14 @@ rmse = np.sqrt(mse)
 #
 # print(regressor.coef_)
 
-df = pd.DataFrame(['Avg. Session Length', 'Time on App',  'Time on Website', 'Length of Membership'], regressor.coef_, columns=['feature'])
+# df = pd.DataFrame(['Avg. Session Length', 'Time on App',  'Time on Website', 'Length of Membership'], regressor.coef_, columns=['feature'])
+# print(df)
+
+df = pd.DataFrame({'datetime_column': ["2021-04-11 12:00:01", "2021-04-13 08:30:45", '08:32:45', "10:30:45"]})
+
+# Convert to datetime and extract time component
+df['only time'] = pd.to_datetime(df['datetime_column'], errors='coerce').dt.time
+df['time'] = df.apply(lambda row: row['only time'] if len(row['datetime_column']) > 8 else row['datetime_column'], axis=1)
+
+
 print(df)

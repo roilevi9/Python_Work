@@ -25,10 +25,10 @@ df_new['Second Car Weight'].fillna(df_new['First Car Weight'], inplace=True)
 df_new.loc[df['First Car Weight'].isna(), 'Second Car Weight'] = df_new['First Car Weight']
 df_new.loc[df['Second Car Weight'].isna(), 'First Car Weight'] = df_new['Second Car Weight']
 
-df.loc[df['First Car Weight'] > 100, 'First Car Weight'] = np.nan
-df.loc[df['Second Car Weight'] > 100, 'Second Car Weight'] = np.nan
-df.loc[df['First Car Weight'] == 0, 'First Car Weight'] = np.nan
-df.loc[df['Second Car Weight'] == 0, 'Second Car Weight'] = np.nan
+df_new.loc[df['First Car Weight'] > 100, 'First Car Weight'] = np.nan
+df_new.loc[df['Second Car Weight'] > 100, 'Second Car Weight'] = np.nan
+df_new.loc[df['First Car Weight'] == 0, 'First Car Weight'] = np.nan
+df_new.loc[df['Second Car Weight'] == 0, 'Second Car Weight'] = np.nan
 df_new.dropna(subset=['First Car Weight', 'Second Car Weight'], how='all', inplace=True)
 
 df_new["Section"] = df_new["Air Force Segment"].fillna(df_new["The Herzl Segment"])
