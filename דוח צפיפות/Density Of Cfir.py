@@ -13,7 +13,7 @@ df.loc[df['Reviewer Name'] == 'Simon', 'Reviewer Name'] = np.nan
 df.loc[df['Reviewer Name'] == 'Yaron', 'Reviewer Name'] = np.nan
 df.dropna(subset=['First Car Weight', 'Second Car Weight'], how='all', inplace=True)
 
-print(df.head(), "\n")
+#print(df.head(), "\n")
 
 df['only time'] = pd.to_datetime(df['Sampling Time'], errors='coerce').dt.time
 df['Sampling Time'] = df.apply(lambda row: row['only time'] if len(row['Sampling Time']) > 8 else row['Sampling Time'], axis=1)
@@ -29,11 +29,29 @@ df['Date'] = df.Date.apply(to_israeli_date)
 df['Time'] = pd.to_datetime(df['Time'], format='%H:%M:%S')
 df["Sampling Time"] = pd.to_datetime(df["Sampling Time"], format='%H:%M:%S')
 
+blank_First_Car_Weight = df['First Car Weight'].isnull().sum()
+
+# Print the count
+print("Number of blank cells in First Car Weight: ", blank_First_Car_Weight)
+
+# Count blank cells in Column2
+blank_Second_Car_Weight = df['Second Car Weight'].isnull().sum()
+print("Number of blank cells in Second Car Weight: ", blank_Second_Car_Weight)
+
 df['First Car Weight'].fillna(df['Second Car Weight'], inplace=True)
 df['Second Car Weight'].fillna(df['First Car Weight'], inplace=True)
 
 df.loc[df['First Car Weight'].isna(), 'Second Car Weight'] = df['First Car Weight']
 df.loc[df['Second Car Weight'].isna(), 'First Car Weight'] = df['Second Car Weight']
+
+blank_First_Car_Weight = df['First Car Weight'].isnull().sum()
+
+# Print the count
+print("Number of blank cells in First Car Weight: ", blank_First_Car_Weight)
+
+# Count blank cells in Column2
+blank_Second_Car_Weight = df['Second Car Weight'].isnull().sum()
+print("Number of blank cells in Second Car Weight: ", blank_Second_Car_Weight)
 
 df.loc[df['First Car Weight'] > 100, 'First Car Weight'] = np.nan
 df.loc[df['Second Car Weight'] > 100, 'Second Car Weight'] = np.nan
@@ -95,9 +113,33 @@ def get_time_range(hour_str):
         return '23:00-0:00'
 
 
-df['time_range'] = df['Sampling Time'].apply(get_time_range)
+df['Time Range'] = df['Sampling Time'].apply(get_time_range)
 
 df.drop(['Air Force Segment', 'The Herzl Segment', "Comments", "Matrix", "Reviewer Name"], axis=1, inplace=True)
 df.reset_index(drop=True)
 
-print(df.head())
+df['First Car Weight'].fillna(df['Second Car Weight'], inplace=True)
+df['Second Car Weight'].fillna(df['First Car Weight'], inplace=True)
+
+df.loc[df['First Car Weight'].isna(), 'Second Car Weight'] = df['First Car Weight']
+df.loc[df['Second Car Weight'].isna(), 'First Car Weight'] = df['Second Car Weight']
+
+# Data Processing:
+Alpha_Model_1 = 6.7525
+Alpha_Model_2 = -19.072
+Beta_Model_1 = 0.8893
+Beta_Model_2 = 1.1707
+Seats_Per_Car = 56
+Standing = 34.5314
+dev = 2.75
+
+df["Conversion First Car"] = df["First Car Weight"] * 3.1
+df["Model First Car"] = np.where(df["Conversion First Car"] < 120, df["Conversion First Car"] * Beta_Model_1 + Alpha_Model_1, df["Conversion First Car"] * Beta_Model_2 + Alpha_Model_2)
+df["Conversion Second Car"] = df["Second Car Weight"] * 3.1
+df["Model Second Car"] = np.where(df["Conversion Second Car"] < 120, df["Conversion Second Car"] * Beta_Model_1 + Alpha_Model_1, df["Conversion Second Car"] * Beta_Model_2 + Alpha_Model_2)
+df["Weight First Car"] = df["Model First Car"] / 3.1
+df["Weight Second Car"] = df["Model Second Car"] / 3.1
+df["Number Of Passengers"] = df["Model First Car"] + df["Model Second Car"]
+
+df.to_excel("All Records - Cfir - First Sorting 3.xlsx", index=False)
+#print(df.head())
