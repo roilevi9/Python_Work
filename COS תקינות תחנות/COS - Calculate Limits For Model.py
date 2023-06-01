@@ -1,5 +1,4 @@
 import pandas as pd
-from scipy import stats
 
 df = pd.read_excel("COS - All Deviations.xlsx", parse_dates=["Date"])
 df['Date'] = pd.to_datetime(df['Date'], format='%d/%m/%Y')
